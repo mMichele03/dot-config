@@ -1,0 +1,186 @@
+(defwidget bar []
+  (centerbox :orientation "h" :valagn "center"
+    (left_block)
+    (center_block)
+    (right_block)))
+
+(defwidget empty []
+"")
+
+(defwidget left_block []
+  (box :class "left_block" :orientation "h" :space-evenly false :halign "start" :spacing "5"
+    (workspaces)
+  )
+)
+
+(defwidget center_block []
+  (box :class "center_block" :orientation "h" :space-evenly false :halign "center" :spacing "5"
+    (timedate)
+  )
+)
+
+(defwidget right_block []
+  (box :class "right_block" :orientation "h" :space-evenly false :halign "end" :spacing "5"
+    (stats)
+    (battery)
+    (utils)
+  )
+)
+
+(defwidget utils []
+  (icon_group
+    (icon :icon_list "󰂯")
+    (box :class "icon-pad"
+      (icon :icon_list "󰖩"))
+    (icon :icon_list "󰤆")
+  ))
+
+(defwidget stats []
+  (box :class "group" :orientation "h" :space-evenly false :halign "center" :spacing "15"
+    (stack
+      :selected mute_state
+      :transition "none"
+      (icon_labeled
+        (icon :icon_list "󰕿󰖀󰕾" :value volume :onclick "wpctl set-mute @DEFAULT_SINK@ 1")
+        (metric
+          :value {round(volume, 0)}
+          :onchange "wpctl set-volume @DEFAULT_SINK@ {}%"
+        ))
+      (icon_labeled
+        (icon :icon_list "󰖁" :onclick "wpctl set-mute @DEFAULT_SINK@ 0")
+        (metric
+          :value {0}
+          :onchange ""
+        ))
+    )
+    (icon_labeled
+      (icon :icon_list "󰃞󰃟󰃠" :value brightness :onclick "wpctl set-mute @DEFAULT_SINK@ 1")
+      (metric
+        :value {round(brightness, 0)}
+        :onchange "wpctl set-volume @DEFAULT_SINK@ {}%"
+      ))
+    ; (icon_labeled
+      ;   (icon :icon_list "󰠵")
+      ;   (metric
+        ;     :value {EWW_RAM.used_mem_perc}
+        ;     :onchange ""
+      ;   ))
+    ; (icon_labeled
+      ;   (icon :icon_list "󰆓")
+      ;   (metric
+        ;     :value {round((1 - (EWW_DISK["/"].free / EWW_DISK["/"].total)) * 100, 0)}
+        ;     :onchange ""
+      ;   ))
+  ))
+
+(defwidget battery []
+  (box :class "group battery"
+    (stack
+      :selected {EWW_BATTERY.BAT0.status == "Charging" ? "1" : "0"}
+      :transition "none"
+      (icon_labeled
+        (icon :icon_list "󰁺󰁻󰁼󰁽󰁾󰁿󰂀󰂁󰂂󰁹" :value "${EWW_BATTERY.BAT0.capacity}")
+        "${EWW_BATTERY.BAT0.capacity}%"
+      )
+      (icon_labeled
+        (icon :icon_list "󰢜󰂆󰂇󰂈󰢝󰂉󰢞󰂊󰂋󰂅" :value "${EWW_BATTERY.BAT0.capacity}")
+        "${EWW_BATTERY.BAT0.capacity}%"
+      )
+    )
+  ))
+
+(defwidget timedate []
+  (box :class "group" :orientation "h" :space-evenly false :spacing "20"
+    time
+    (icon_labeled
+      (icon :icon_list "󰃭")
+      date
+    )
+  ))
+
+(defwidget workspaces []
+  (box :class "group" :space-evenly true :spacing 10
+    (button :onclick "wmctrl -s 0" 1)
+    (button :onclick "wmctrl -s 1" 2)
+    (button :onclick "wmctrl -s 2" 3)
+    (button :onclick "wmctrl -s 3" 4)
+    (button :onclick "wmctrl -s 4" 5)
+    (button :onclick "wmctrl -s 5" 6)
+    (button :onclick "wmctrl -s 6" 7)
+    (button :onclick "wmctrl -s 7" 8)
+    (button :onclick "wmctrl -s 8" 9)))
+
+(defwidget music []
+  (box :class "music"
+    :orientation "h"
+    :space-evenly false
+    :halign "center"
+  {music != "" ? "🎵${music}" : ""}))
+
+(defwidget metric [value onchange]
+  (box :orientation "h" :class "metric" :space-evenly false
+    (scale
+      :min 0 :max 101
+      :active {onchange != ""}
+      :value value
+      :onchange onchange
+    )))
+
+(defwidget icon [icon_list ?value ?onclick]
+  (button :onclick onclick
+    (box :orientation "h" :class "icon"
+      {
+      (value == "") ? "${icon_list}" :
+      (value == "") ? "spec" :
+      "${search(icon_list, ".")[((value - 1) * (strlength(icon_list) / 4) / 100) - ((value - 1) * (strlength(icon_list) / 4) / 100) % 1]}"
+      }
+    )
+  )
+)
+
+(defwidget icon_labeled []
+  (box :class "labeled" :orientation "h" :space-evenly false :spacing "10"
+    (children)))
+
+(defwidget icon_group [?spacing]
+  (box :class "group" :orientation "h" :space-evenly false :spacing "${spacing == "" ? 10 : spacing}"
+    (children)))
+
+(deflisten music :initial ""
+  "playerctl --follow metadata --format '{{ artist }} - {{ title }}' || true"
+)
+
+(defpoll volume :interval "10ms"
+  `wpctl get-volume @DEFAULT_SINK@ | awk -F ' ' '{print $2 * 100}'`
+)
+
+(defpoll mute_state :interval "10ms"
+  `wpctl get-volume @DEFAULT_SINK@ | awk -F ' ' '{if($3==""){print "0"}else{print "1"}}'`
+)
+
+(defpoll brightness :interval "10ms"
+  `brightnessctl g | awk '{print int($1 * 100 / 255)}'`
+)
+
+(defpoll workspaces_json :interval "10ms"
+  `hyprctl workspaces -j`
+)
+
+(defpoll time :interval "1s"
+"date '+%H:%M'")
+
+(defpoll date :interval "1s"
+"date '+%b %d'")
+
+(defwindow bar
+  :monitor 0
+  :geometry (geometry
+    :x "0%"
+    :y "5px"
+    :width "1900px"
+    :height "30px"
+  :anchor "top center")
+  :stacking "bg"
+  :exclusive true
+  
+  (bar))

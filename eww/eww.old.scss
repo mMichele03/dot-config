@@ -1,0 +1,18 @@
+/* Global */
+* {
+    all: unset;
+    font-family: Cantarell;
+    font-size: 20px;
+    background-color: rgba($color: #000000, $alpha: 1.0);
+}
+
+.barbox {
+    // padding-left: 10px;
+    // padding-right: 10px;
+    // margin-left: 5px;
+    // margin-right: 5px;
+    color: #FFFFFF;
+    background-color: rgba($color: #000000, $alpha: 0.2);
+    border-radius: 12px;
+    border: 2px solid rgba($color: #FFFFFF, $alpha: 0.75);
+}

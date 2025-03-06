@@ -1,0 +1,53 @@
+(defpoll timeSeconds
+  :interval "1s"
+`date +%H:%M:%S`)
+
+(defpoll time
+  :interval "1s"
+`date +%H:%M`)
+
+(defpoll batteryPercent
+  :interval "1s"
+`cat /sys/class/power_supply/BAT0/capacity`)
+
+(defwidget timeW []
+  (box
+    :width "150"
+    :class "barbox"
+    "${time}"
+  )
+)
+
+(defwidget batteryW []
+  (box
+    :width "70"
+    :class "barbox"
+    EWW_BATTERY
+  )
+)
+
+(defwindow example
+  :monitor 0
+  :geometry (geometry
+    :x "0%"
+    :y "10px"
+    :width "700px" ; 1920 max
+    :height "35px"
+    :anchor "top center"
+  )
+  :stacking "fg"
+  :exclusive true
+  
+  (box
+    ; :class "barbox"
+    :orientation "horizontal"
+    :halign "center"
+    :valign "center"
+    :space_evenly false
+    :spacing 10
+    :height "35"
+    
+    (timeW)
+    (batteryW)
+  )
+)

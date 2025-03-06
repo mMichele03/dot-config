@@ -1,0 +1,52 @@
+* {
+    all: unset; // Unsets everything so you can style everything from scratch
+}
+
+// Global Styles
+.bar {
+    color: #FFFFFF;
+    // padding: 10px;
+}
+
+// Styles on classes (see eww.yuck for more information)
+
+.group {
+    background-color: rgba($color: #000000, $alpha: 0.2);
+    border-radius: 10px;
+    border: 2px solid rgba($color: #33ccff, $alpha: 0.9);
+    padding: 0px 10px 0px 10px;
+}
+
+.group slider {
+    all: unset;
+    color: #ffd5cd;
+}
+
+.icon {
+    font-size: 18px;
+    color: rgba($color: #ffffff, $alpha: 1.0);
+    padding: 0px 2px 0px 0px;
+}
+
+.icon-pad {
+    padding: 0px 3px 0px 0px;
+}
+
+.metric scale trough highlight {
+    all: unset;
+    background-color: rgba($color: #33ccff, $alpha: 0.9);
+    color: #000000;
+    border-radius: 10px;
+}
+
+.metric scale trough {
+    all: unset;
+    background-color: #4e4e4e;
+    border-radius: 50px;
+    min-height: 10px;
+    min-width: 50px;
+}
+
+.group button:hover {
+    color: rgba($color: #33ccff, $alpha: 0.9);
+}
